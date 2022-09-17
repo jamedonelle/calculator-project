@@ -19,7 +19,9 @@ export const ACTIONS = {
 function evaluate({currentOperand,previousOperand,operation}){
   const prev = parseFloat(previousOperand)
   const curr = parseFloat(currentOperand)
+
   if(isNaN(prev || isNaN(curr))) return ""
+
   let computation = ""
   switch(operation){
     case "+":
@@ -52,10 +54,12 @@ function reducer(state,{type,payload}) {
         }
       }
 
+      // edge case for multiple 0's before the decimal
       if(payload.digit === "0" && state.currentOperand === "0"){
         return state
       }
 
+      // make sure there can only be on decimal
       if(payload.digit === "." && state.currentOperand.includes(".")){
         return state
       }
@@ -64,11 +68,13 @@ function reducer(state,{type,payload}) {
         ...state,
         currentOperand: `${state.currentOperand || ""}${payload.digit}`
       }
+
     case ACTIONS.CHOOSE_OPERATION:
       if(state.currentOperand == null && state.previousOperand == null){
         return state
       }
 
+      // this makes you able to change the operations before pressing equal.
       if(state.currentOperand == null){
         return {
           ...state,
@@ -85,6 +91,7 @@ function reducer(state,{type,payload}) {
         }
       }
       
+      // default case makes you able to do continuous operations
       return {
         ...state,
         previousOperand: evaluate(state),
@@ -110,10 +117,12 @@ function reducer(state,{type,payload}) {
         currentOperand: state.currentOperand.slice(0,-1)
       }
     case ACTIONS.EQUALS:
+      // make sure we have all we need to do operation
       if(state.previousOperand == null || state.currentOperand == null || 
         state.operation == null){
         return state
       }
+      
       return {
         ...state,
         previousOperand: null,
